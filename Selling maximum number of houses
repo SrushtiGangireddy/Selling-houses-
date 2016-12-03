@@ -1,0 +1,146 @@
+import java.io.*;
+import java.util.*;
+import java.math.*;
+
+public class Solution{
+    public static void main(String args[]){
+        
+        Scanner sc=new Scanner(System.in);
+        
+        int num_clients=sc.nextInt();
+        int num_houses=sc.nextInt();
+        
+        
+        HashMap<Integer,ArrayList<Integer>> client_req=new HashMap<Integer,ArrayList<Integer>>();
+        HashMap<Integer,ArrayList<Integer>> house_spec = new HashMap<Integer,ArrayList<Integer>>();
+        
+        for(int i=0;i<num_clients;i++){
+            
+            ArrayList<Integer> al=new ArrayList<Integer>();
+            
+            int area=sc.nextInt();
+            int price=sc.nextInt();
+            
+            al.add(area);
+            al.add(price);
+            
+            client_req.put(i,al);
+            
+        }
+        
+        for(int j=0;j<num_houses;j++){
+            
+            ArrayList<Integer> h=new ArrayList<Integer>();
+            
+            int xa=sc.nextInt();
+            int ya=sc.nextInt();
+            
+            h.add(xa);
+            h.add(ya);
+            
+            house_spec.put(j,h);
+            
+        }
+        
+        
+        
+        
+        numHousesSold(client_req,house_spec,num_houses);        
+        
+    }
+    
+    public static void numHousesSold(HashMap<Integer,ArrayList<Integer>> c,HashMap<Integer,ArrayList<Integer>> h,int num_houses){
+        
+        HashMap<Integer,ArrayList<Integer>> desires=new HashMap<Integer,ArrayList<Integer>>();
+        TreeSet<Integer> houses_wanted=new TreeSet<Integer>();
+        
+        
+        int houses_sold=0;
+        
+        int random_house_sold = 0;
+            
+        Iterator it=c.entrySet().iterator();
+        
+        while(it.hasNext()){
+            ArrayList<Integer> housenums=new ArrayList<Integer>();
+            Map.Entry pair=(Map.Entry)it.next();
+            
+            int client=(Integer)pair.getKey();
+            ArrayList<Integer> al=(ArrayList)pair.getValue();
+            
+            int area=(Integer)al.get(0);
+            int price=(Integer)al.get(1);
+            
+            Iterator hit = h.entrySet().iterator();
+            
+            while(hit.hasNext()){
+                Map.Entry hou=(Map.Entry)hit.next();
+                int house_num=(Integer)hou.getKey();
+                ArrayList<Integer> ap = (ArrayList<Integer>)hou.getValue();
+                
+                int house_area=(Integer)ap.get(0);
+                int house_price=(Integer)ap.get(1);
+                
+                if((house_area > area) && (house_price <= price)){
+                    housenums.add(house_num);
+                    houses_wanted.add(house_num);
+                }
+                
+            }
+            
+         
+            
+            desires.put(client,housenums);
+            
+            
+        }
+        
+        randomSell(desires,houses_wanted);
+        
+        
+       
+        
+        
+    }
+    
+    public static void randomSell(HashMap<Integer,ArrayList<Integer>> desires,TreeSet<Integer> houses_wanted){
+        
+        ArrayList<Integer> sold_number=new ArrayList<Integer>();
+        List<ArrayList<Integer>> valueslist=new ArrayList<ArrayList<Integer>>(desires.values());
+        
+        for(int i=0;i<valueslist.size();i++){
+            int houses_sold = 0;
+            TreeSet<Integer> ts=new TreeSet<Integer>(houses_wanted);
+            for(int j=i;j<valueslist.size();j++){
+                ArrayList<Integer> circle = valueslist.get(j);
+                for(int num:circle){
+                    if(ts.contains(num)){
+                        houses_sold++;
+                        ts.remove(num);
+                        break;
+                    }
+                }   
+            }
+            
+            
+            for(int k=i-1;k>=0;k--){
+                ArrayList<Integer> anticir = valueslist.get(k);
+                for(int n:anticir){
+                    if(ts.contains(n)){
+                        houses_sold++;
+                        ts.remove(n);
+                        break;
+                    }
+                }
+            }
+          
+            sold_number.add(houses_sold);
+            
+        }
+        
+        Collections.sort(sold_number);
+        System.out.println(sold_number.size());
+        System.out.println(sold_number.get(sold_number.size()-1));
+        
+    }
+}
